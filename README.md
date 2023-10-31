@@ -32,7 +32,7 @@ create-salt-extension -A "Maintainer Name" -E "maintainer@example.com" -S "Salt 
 
 Dry run migration of modules that contain "apache" in their name from a branch called "filter_source into an extension directory called "saltext-apache"
 ```
-extension-migrate.py --dry-run --file_filter apache --source_branch filter-source --extension_dir saltext-apache
+extension-migrate.py --dry_run --file_filter apache --source_branch filter-source --extension_dir saltext-apache
 ```
 
 Migration of modules that contain "apache" in their name from a branch called "filter_source into an extension directory called "saltext-apache"
