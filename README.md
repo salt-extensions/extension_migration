@@ -3,6 +3,31 @@ A repository to track and coordinate the migration of Salt modules to extensions
 ### Install the salt-extension tool
 https://github.com/saltstack/salt-extension
 
+Create an empty working directory
+```
+mkdir working-dir
+```
+
+Change into the working directory
+```
+cd working-dir
+```
+
+Create an empty directory to hold the extension migration files
+```
+mkdir apache
+```
+
+Change into the extension migration directory
+```
+cd apache
+```
+
+Create the new salt extension inside the extension migration directory
+```
+create-salt-extension -A "Maintainer Name" -E "maintainer@example.com" -S "Salt Extension for interacting with Apache" -U "https://github.com/salt-extensions/saltext-apache" -L apache --dest saltext-apache saltext-apache
+```
+
 ### Instructions for running extension-migrate.py
 
 Dry run migration of modules that contain "apache" in their name from a branch called "filter_source into an extension directory called "saltext-apache"
@@ -10,7 +35,7 @@ Dry run migration of modules that contain "apache" in their name from a branch c
 extension-migrate.py --dry-run --file_filter apache --source_branch filter-source --extension_dir saltext-apache
 ```
 
-Migration of modules that contain "zookeeper" in their name from a branch called "filter_source into an extension directory called "saltext-zookeeper"
+Migration of modules that contain "apache" in their name from a branch called "filter_source into an extension directory called "saltext-apache"
 ```
-extension-migrate.py --file_filter zookeeper --source_branch filter-source --extension_dir saltext-zookeeper
+extension-migrate.py --file_filter apache --source_branch filter-source --extension_dir saltext-apache
 ```
