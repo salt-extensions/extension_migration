@@ -56,3 +56,14 @@ Migration of modules that contain "apache" in their name from a branch called "f
 ```
 extension-migrate.py --file_filter apache --source_branch filter-source --extension_dir saltext-apache
 ```
+
+Resolve any merge conflicts
+
+Merge filter-target into main branch
+```
+git commit -m 'merging in' -a
+git checkout main
+git merge filter-target
+```
+
+Push to Salt extension repository
