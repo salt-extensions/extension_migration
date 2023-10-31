@@ -32,7 +32,6 @@ Setup the extension as a git repostitory
 ```
 cd saltext-apache
 git init .
-git commit -a
 pre-commit install
 git add .
 git commit -a
