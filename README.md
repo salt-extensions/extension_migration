@@ -66,4 +66,9 @@ git checkout main
 git merge filter-target
 ```
 
+Change any references to `__utils__` to salt.utils
+```
+SALTEXT_NAME=apache salt-rewrite -F fix_saltext_utils_imports .
+```
+
 Push to Salt extension repository
