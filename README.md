@@ -37,7 +37,7 @@ git add .
 git commit -a
 ```
 Previous commands will likely fail becuse project dependencies are being pinned.
-Clean out build and artifacts and run away.
+Clean out build and artifacts and run again.
 ```
 sudo rm -rf ./build/*
 sudo rm -rf ./artifacts/*
