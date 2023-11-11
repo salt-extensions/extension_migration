@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import argparse
 import fnmatch
 import os
@@ -7,35 +6,42 @@ import re
 import subprocess
 import sys
 
+# Define command-line arguments
 parser = argparse.ArgumentParser()
-parser.add_argument("-b", "--source_branch", help = "Source Branch.", required=True)
-parser.add_argument("-f", "--file_filter", help = "Name to use to filter files, also name of the extension.", required=True)
-parser.add_argument("-n", "--dry_run", help = "Dry run.", action="store_true")
-parser.add_argument("-e", "--extra_files", nargs="+", help = "Exta files.", required=False)
-parser.add_argument("-d", "--extension_dir", help = "Extension directory.", required=True)
-
+parser.add_argument("-b", "--source_branch", help="Source Branch.", required=True)
+parser.add_argument(
+    "-f",
+    "--file_filter",
+    help="Name to use to filter files, also the name of the extension.",
+    required=True,
+)
+parser.add_argument("-n", "--dry_run", help="Dry run.", action="store_true")
+parser.add_argument("-e", "--extra_files", nargs="+", help="Extra files.", required=False)
+parser.add_argument("-d", "--extension_dir", help="Extension directory.", required=True)
 args = parser.parse_args()
 
-# Clone salt
+
+def run_command(cmd):
+    cmd_list = cmd.split(" ")
+    subprocess.run(cmd_list)
+
+
+# Clone salt repository
 print("Cloning Salt")
 previous_cwd = os.getcwd()
-cmd = ["git", "clone", "git@github.com:saltstack/salt.git", "--single-branch"]
-process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
+run_command("git clone git@github.com:saltstack/salt.git --single-branch")
 os.chdir("salt")
 
 # Create the filter-source branch
 print("Checking out filter-source branch")
-cmd = ["git", "checkout", "-b", "filter-source"]
-process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
+run_command("git checkout -b filter-source")
 
 print("Calculating files")
 files_to_migrate = []
 for root, dirs, files in os.walk("."):
     path = root.split(os.sep)
+    full_path = os.path.join(*path)
     for _file in fnmatch.filter(files, f"*{args.file_filter}*"):
-        full_path = "/".join(path)
         dirname_full_path_file = os.path.dirname(f"{full_path}/{_file}")
         files_to_migrate.append(f"{full_path}/{_file}")
         if os.path.exists(f"{dirname_full_path_file}/conftest.py"):
@@ -47,15 +53,15 @@ for root, dirs, files in os.walk("."):
             files_to_migrate.append(f"{parent_dirname_full_path_file}/__init__.py")
 
     for _dir in fnmatch.filter(dirs, f"*{args.file_filter}*"):
-        full_path = "/".join(path)
         files_to_migrate.append(f"{full_path}/{_dir}")
 
     for _file in fnmatch.filter(files, "*conftest.py*"):
-        full_path = "/".join(path)
         file_full_path = f"{full_path}/{_file}"
-        if file_full_path in ("./tests/pytests/unit/conftest.py",
-                              "./tests/pytests/integration/conftest.py",
-                              "./tests/pytests/functional/conftest.py"):
+        if file_full_path in (
+            "./tests/pytests/unit/conftest.py",
+            "./tests/pytests/integration/conftest.py",
+            "./tests/pytests/functional/conftest.py",
+        ):
             files_to_migrate.append(f"{full_path}/{_file}")
 
 # Add any extra files
@@ -70,8 +76,7 @@ old_files = []
 new_files = []
 
 for file in files_to_migrate:
-
-    new_file = re.sub("\.\/", "", file)
+    new_file = re.sub(r"\.\/", "", file)
     old_files.append(new_file)
 
     # swap doc for docs
@@ -83,62 +88,44 @@ for file in files_to_migrate:
     new_files.append(new_file)
 
 print("Filtering files")
-cmd = ["git", "filter-repo"]
+cmd = "git filter-repo"
 for count in range(len(old_files)):
-    cmd.append("--path")
-    cmd.append(f"{old_files[count]}")
-cmd.append("--refs")
-cmd.append("refs/heads/filter-source")
-cmd.append("--force")
+    cmd += f" --path {old_files[count]}"
+cmd += " --refs refs/heads/filter-source --force"
 
 if args.dry_run:
-    print(" ".join(cmd))
+    print(cmd)
 else:
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-
-print("")
+    run_command(cmd)
 
 print("Renaming Paths")
-cmd = ["git", "filter-repo"]
+cmd = "git filter-repo"
 for count in range(len(old_files)):
-    cmd.append("--path-rename")
-    cmd.append(f"{old_files[count]}:{new_files[count]}")
-cmd.append("--force")
+    cmd += f" --path-rename {old_files[count]}:{new_files[count]}"
+cmd += " --force"
 
 if args.dry_run:
-    print(" ".join(cmd))
+    print(cmd)
 else:
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
+    run_command(cmd)
 
-os.chdir(previous_cwd)
+    os.chdir(previous_cwd)
 
-# change into extension directory
-os.chdir(args.extension_dir)
+    # Change into the extension directory
+    os.chdir(args.extension_dir)
 
-# Create the filter-target branch
-print("Checking out filter-target branch")
-cmd = ["git", "checkout", "-b", "filter-target"]
-process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
+    # Create the filter-target branch
+    print("Checking out filter-target branch")
+    run_command("git checkout -b filter-target")
 
-print("Adding repo-source remote")
-cmd = ["git", "remote", "add", "repo-source", "../salt"]
-process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
+    print("Adding repo-source remote")
+    run_command("git remote add repo-source ../salt")
 
-print("Fetch repo-source remote")
-cmd = ["git", "fetch", "repo-source"]
-process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
+    print("Fetch repo-source remote")
+    run_command("git fetch repo-source")
 
-print("Creating the branch-source branch")
-cmd = ["git", "branch", "branch-source", "remotes/repo-source/filter-source"]
-process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
+    print("Creating the branch-source branch")
+    run_command("git branch branch-source remotes/repo-source/filter-source")
 
-print("Merge branch-source into extension")
-cmd = ["git", "merge", "branch-source", "--allow-unrelated-histories"]
-process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = process.communicate()
+    print("Merge branch-source into extension")
+    run_command("git merge branch-source --allow-unrelated-histories")
