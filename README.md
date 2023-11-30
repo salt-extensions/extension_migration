@@ -45,7 +45,7 @@ create-salt-extension -A "Maintainer Name" \
 ```
 
 > **Note:** The `-L apache` option sets the license of the extension to "Apache 2.0" and should not be changed when
-> replacing placeholder text in the previous command.
+> replacing placeholder text in the previous command. The other `apache` will be replaced with the name of the extension you are migrating.
 
 ### 5. Set Up the Extension Repository
 
@@ -59,7 +59,7 @@ pre-commit install
 git commit -a -m "Initial commit of extension framework"
 ```
 
-> **Note:** In case of failures due to pinned project dependencies, clean out build and artifacts, and try again.
+> **Note:** In case of failures due to pinned project dependencies, clean out build and artifacts like below, and try again.
 
 ```bash
 sudo rm -rf ./build/*
@@ -72,6 +72,8 @@ git commit -a -m "Initial commit of extension framework"
 Follow these instructions to migrate Salt modules to extensions.
 
 ### 1. Dry Run Migration
+
+First, git clone this extension-migration to your local environment into a separate folder not in your saltext-_____.
 
 To perform a dry run migration of modules that contain "apache" in their name from a branch called "filter-source" into
 an extension directory called "saltext-apache", use the following command:
