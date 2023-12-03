@@ -54,17 +54,20 @@ Navigate into the extension directory and initialize it as a Git repository:
 ```bash
 cd saltext-apache
 git init --initial-branch=main
-pip install pre-commit
+pip install pre-commit (may not need to be done again if in a pre-existing virtual environment)
 pre-commit install
 git commit -a -m "Initial commit of extension framework"
 ```
+> *You may need to `pip install` `git-filter-repo` and `pylint`.
 
 > **Note:** In case of failures due to pinned project dependencies, clean out build and artifacts like below, and try again.
 
 ```bash
 sudo rm -rf ./build/*
 sudo rm -rf ./artifacts/*
-git commit -a -m "Initial commit of extension framework"
+touch requirements/{changelog,dev,docs,docs-auto,lint,tests}.txt
+git add .
+git commit -m "Initial commit of extension framework"
 ```
 
 ## Migrating Salt Modules to Extensions
@@ -84,6 +87,8 @@ extension-migrate.py --dry_run \
     --source_branch filter-source \
     --extension_dir saltext-apache
 ```
+
+Note that all the dry-run does is preprare the command and then echo it to the terminal.
 
 ### 2. Actual Migration
 
