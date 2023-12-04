@@ -54,7 +54,7 @@ Navigate into the extension directory and initialize it as a Git repository:
 ```bash
 cd saltext-apache
 git init --initial-branch=main
-pip install pre-commit #may not need to be done again if in a pre-existing virtual environment
+pip install pre-commit # may not need to be done again if in a pre-existing virtual environment
 pre-commit install
 git commit -a -m "Initial commit of extension framework"
 ```
