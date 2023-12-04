@@ -56,7 +56,8 @@ cd saltext-apache
 git init --initial-branch=main
 pip install pre-commit # may not need to be done again if in a pre-existing virtual environment
 pre-commit install
-git commit -a -m "Initial commit of extension framework"
+git add .
+git commit -m "Initial commit of extension framework"
 ```
 > *You may need to `pip install` `git-filter-repo` and `pylint`.
 
@@ -88,7 +89,7 @@ extension-migrate.py --dry_run \
     --extension_dir saltext-apache
 ```
 
-Note that all the dry-run does is preprare the command and then echo it to the terminal.
+Note that all the dry-run does is preprare the command and then echo it to the terminal. If you run the dry run, and then the actual migration, you may get a `fatal error` complaining something already is created. This is not actaully a fatal error and can be safely ignored.
 
 ### 2. Actual Migration
 
