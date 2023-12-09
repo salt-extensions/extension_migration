@@ -53,7 +53,7 @@ Navigate into the extension directory and initialize it as a Git repository:
 
 ```bash
 cd saltext-apache
-git init # If you are not using git > 2.28, it will default to the branch being "master" instead of "main" - you won't be able to change it until after you do a commit.
+git init # If you are not using git < 2.28, it will default to the branch being "master" instead of "main" - you won't be able to change it until after you do a commit.
 touch requirements/{changelog,dev,docs,docs-auto,lint,tests}.txt
 pip install pre-commit # may not need to be done again if in a pre-existing virtual environment
 pre-commit install
