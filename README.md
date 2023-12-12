@@ -53,7 +53,7 @@ Navigate into the extension directory and initialize it as a Git repository:
 
 ```bash
 cd saltext-apache
-git init # If you are not using git < 2.28, it will default to the branch being "master" instead of "main" - you won't be able to change it until after you do a commit.
+git init 
 touch requirements/{changelog,dev,docs,docs-auto,lint,tests}.txt
 pip install pre-commit # may not need to be done again if in a pre-existing virtual environment
 pre-commit install
@@ -61,6 +61,7 @@ git add .
 git commit -m "Initial commit of extension framework"
 ```
 > *You may need to `pip install` `git-filter-repo` and `pylint`.
+> If you are not using git < 2.28, it will default to the branch being "master" instead of "main" - you won't be able to change it until after you do a commit.
 
 > **Note:** In case of failures due to pinned project dependencies, clean out build and artifacts like below, and try again.
 
