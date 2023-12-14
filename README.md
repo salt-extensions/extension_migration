@@ -21,7 +21,7 @@ cd working-dir
 ```
 ### 3. Run the prepare-for-migration.py script
 
-It will do all the previous steps up to do running `git commit`
+It will do all the previous steps up to running `git commit`
 
 ## Manual - if the script doesn't work
 
