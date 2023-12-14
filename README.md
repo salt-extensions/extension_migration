@@ -66,7 +66,7 @@ git add .
 git commit -m "Initial commit of extension framework"
 ```
 > *You may need to `pip install` `git-filter-repo` and `pylint`.
-> If you are not using git < 2.28, it will default to the branch being "master" instead of "main" - you won't be able to change it until after you do a commit.
+> If you are using git < 2.28, the `initial-branch` option is not present and `git init` will default to the branch being "master" instead of "main". Note that you won't be able to change it with `git branch -m master main` until after your first commit.
 
 > **Note:** In case of failures due to pinned project dependencies, clean out build and artifacts like below, and try again.
 
