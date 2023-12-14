@@ -83,7 +83,9 @@ Follow these instructions to migrate Salt modules to extensions.
 
 ### 1. Dry Run Migration
 
-First, git clone this extension-migration to your local environment into a separate folder not in your saltext-_____.
+First, git clone this extension-migration to your local environment into a separate folder, not in your `saltext-_____` (if it isn't already).
+
+then, cd into the directory before saltext-_______ (example, the `helm` directory instead of `saltext-helm`)
 
 To perform a dry run migration of modules that contain "apache" in their name from a branch called "filter-source" into
 an extension directory called "saltext-apache", use the following command:
@@ -116,7 +118,8 @@ If there are any merge conflicts, resolve them manually.
 Merge the "filter-target" branch into the main branch:
 
 ```bash
-git commit -a -m "Merging in modules from Salt"
+git add .
+git commit -m "Merging in modules from Salt"
 git checkout main
 git merge filter-target
 ```
