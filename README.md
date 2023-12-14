@@ -19,6 +19,11 @@ Create an empty working directory and navigate into it:
 mkdir working-dir
 cd working-dir
 ```
+### 3. Run the prepare-for-migration.py script
+
+It will do all the previous steps up to running `git commit`
+
+## Manual - if the script doesn't work
 
 ### 3. Create a Directory for Extension Migration
 
@@ -61,6 +66,7 @@ git add .
 git commit -m "Initial commit of extension framework"
 ```
 > *You may need to `pip install` `git-filter-repo` and `pylint`.
+> If you are using git < 2.28, the `initial-branch` option is not present and `git init` will default to the branch being "master" instead of "main". Note that you won't be able to change it with `git branch -m master main` until after your first commit.
 
 > **Note:** In case of failures due to pinned project dependencies, clean out build and artifacts like below, and try again.
 
@@ -77,7 +83,9 @@ Follow these instructions to migrate Salt modules to extensions.
 
 ### 1. Dry Run Migration
 
-First, git clone this extension-migration to your local environment into a separate folder not in your saltext-_____.
+First, git clone this extension-migration to your local environment into a separate folder, not in your `saltext-_____` (if it isn't already).
+
+then, cd into the directory before saltext-_______ (example, the `helm` directory instead of `saltext-helm`)
 
 To perform a dry run migration of modules that contain "apache" in their name from a branch called "filter-source" into
 an extension directory called "saltext-apache", use the following command:
@@ -110,7 +118,8 @@ If there are any merge conflicts, resolve them manually.
 Merge the "filter-target" branch into the main branch:
 
 ```bash
-git commit -a -m "Merging in modules from Salt"
+git add .
+git commit -m "Merging in modules from Salt"
 git checkout main
 git merge filter-target
 ```
