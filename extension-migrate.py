@@ -46,10 +46,10 @@ for root, dirs, files in os.walk("."):
         files_to_migrate.append(f"{full_path}/{_file}")
         if os.path.exists(f"{dirname_full_path_file}/conftest.py"):
             files_to_migrate.append(f"{dirname_full_path_file}/conftest.py")
-        if os.path.exists(f"{dirname_full_path_file}/__init__.py"):
+        if os.path.exists(f"{dirname_full_path_file}/__init__.py") and f"{dirname_full_path_file}/__init__.py" != "salt/__init__.py":
             files_to_migrate.append(f"{dirname_full_path_file}/__init__.py")
         parent_dirname_full_path_file = os.path.dirname(f"{dirname_full_path_file}")
-        if os.path.exists(f"{parent_dirname_full_path_file}/__init__.py"):
+        if os.path.exists(f"{parent_dirname_full_path_file}/__init__.py") and f"{parent_dirname_full_path_file}/__init__.py" != "salt/__init__.py":
             files_to_migrate.append(f"{parent_dirname_full_path_file}/__init__.py")
 
     for _dir in fnmatch.filter(dirs, f"*{args.file_filter}*"):
@@ -83,7 +83,7 @@ for file in files_to_migrate:
     new_file = re.sub("^doc", "docs", new_file)
 
     # swap salt path for extension path
-    new_file = re.sub("^salt", f"src/saltext/saltext_{args.file_filter}", new_file)
+    new_file = re.sub("^salt", f"src/saltext/{args.file_filter}", new_file)
 
     new_files.append(new_file)
 
