@@ -19,11 +19,6 @@ Create an empty working directory and navigate into it:
 mkdir working-dir
 cd working-dir
 ```
-### 3. Run the prepare-for-migration.py script
-
-It will do all the previous steps up to running `git commit`
-
-## Manual - if the script doesn't work
 
 ### 3. Create a Directory for Extension Migration
 
