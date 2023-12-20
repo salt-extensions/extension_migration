@@ -18,23 +18,31 @@ parser.add_argument(
 parser.add_argument("-n", "--dry_run", help="Dry run.", action="store_true")
 parser.add_argument("-e", "--extra_files", nargs="+", help="Extra files.", required=False)
 parser.add_argument("-d", "--extension_dir", help="Extension directory.", required=True)
+parser.add_argument("-z", "--debug", help="Display extra debugging info", action="store_true")
 args = parser.parse_args()
 
 
 def run_command(cmd):
     cmd_list = cmd.split(" ")
-    subprocess.run(cmd_list)
+    return subprocess.run(cmd_list)
 
 
 # Clone salt repository
 print("Cloning Salt")
 previous_cwd = os.getcwd()
-run_command("git clone git@github.com:saltstack/salt.git --single-branch")
+ret = run_command("git clone git@github.com:saltstack/salt.git --single-branch")
+if ret.returncode != 0:
+    print(f"Failure: {ret.stderr}")
+    sys.exit(ret.returncode)
+
 os.chdir("salt")
 
 # Create the filter-source branch
 print("Checking out filter-source branch")
-run_command("git checkout -b filter-source")
+ret = run_command("git checkout -b filter-source")
+if ret.returncode != 0:
+    print(f"Failure: {ret.stderr}")
+    sys.exit(ret.returncode)
 
 print("Calculating files")
 files_to_migrate = []
@@ -93,10 +101,16 @@ for count in range(len(old_files)):
     cmd += f" --path {old_files[count]}"
 cmd += " --refs refs/heads/filter-source --force"
 
-if args.dry_run:
+if args.debug:
     print(cmd)
+
+if args.dry_run:
+    print("Would have run git filter-repo to filter files")
 else:
-    run_command(cmd)
+    ret = run_command(cmd)
+    if ret.returncode != 0:
+        print(f"Failure: {ret.stderr}")
+        sys.exit(ret.returncode)
 
 print("Renaming Paths")
 cmd = "git filter-repo"
@@ -104,10 +118,21 @@ for count in range(len(old_files)):
     cmd += f" --path-rename {old_files[count]}:{new_files[count]}"
 cmd += " --force"
 
-if args.dry_run:
+if args.debug:
     print(cmd)
+
+if args.dry_run:
+    print("Would have run git filter-repo to rename paths")
+    print("Would have checked out filter-target branch")
+    print("would have added the repo-source remote")
+    print("Would have fetched repo-source remote")
+    print("Would have created the branch-source branch")
+    print("Would have merged branch-source into extension")
 else:
-    run_command(cmd)
+    ret = run_command(cmd)
+    if ret.returncode != 0:
+        print(f"Failure: {ret.stderr}")
+        sys.exit(ret.returncode)
 
     os.chdir(previous_cwd)
 
@@ -116,16 +141,33 @@ else:
 
     # Create the filter-target branch
     print("Checking out filter-target branch")
-    run_command("git checkout -b filter-target")
+    ret = run_command("git checkout -b filter-target")
+    if ret.returncode != 0:
+        print(f"Failure: {ret.stderr}")
+        sys.exit(ret.returncode)
 
     print("Adding repo-source remote")
-    run_command("git remote add repo-source ../salt")
+    ret = run_command("git remote add repo-source ../salt")
+    if ret.returncode != 0:
+        print(f"Failure: {ret.stderr}")
+        sys.exit(ret.returncode)
 
     print("Fetch repo-source remote")
-    run_command("git fetch repo-source")
+    ret = run_command("git fetch repo-source")
+    if ret.returncode != 0:
+        print(f"Failure: {ret.stderr}")
+        sys.exit(ret.returncode)
 
     print("Creating the branch-source branch")
-    run_command("git branch branch-source remotes/repo-source/filter-source")
+    ret = run_command("git branch branch-source remotes/repo-source/filter-source")
+    if ret.returncode != 0:
+        print(f"Failure: {ret.stderr}")
+        sys.exit(ret.returncode)
 
     print("Merge branch-source into extension")
-    run_command("git merge branch-source --allow-unrelated-histories")
+    ret = run_command("git merge branch-source --allow-unrelated-histories")
+    if ret.returncode != 0:
+        print(f"Failure: {ret.stderr}")
+        sys.exit(ret.returncode)
+
+print("Success!")
