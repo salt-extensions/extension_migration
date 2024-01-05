@@ -24,25 +24,23 @@ args = parser.parse_args()
 
 def run_command(cmd):
     cmd_list = cmd.split(" ")
-    return subprocess.run(cmd_list)
+    ret = subprocess.run(cmd_list)
+    if ret.returncode != 0:
+        print(f"Failure: {ret.stderr}")
+        sys.exit(ret.returncode)
+    return
 
 
 # Clone salt repository
 print("Cloning Salt")
 previous_cwd = os.getcwd()
-ret = run_command("git clone git@github.com:saltstack/salt.git --single-branch")
-if ret.returncode != 0:
-    print(f"Failure: {ret.stderr}")
-    sys.exit(ret.returncode)
+run_command("git clone git@github.com:saltstack/salt.git --single-branch")
 
 os.chdir("salt")
 
 # Create the filter-source branch
 print("Checking out filter-source branch")
-ret = run_command("git checkout -b filter-source")
-if ret.returncode != 0:
-    print(f"Failure: {ret.stderr}")
-    sys.exit(ret.returncode)
+run_command("git checkout -b filter-source")
 
 print("Calculating files")
 files_to_migrate = []
@@ -113,10 +111,7 @@ if args.debug:
 if args.dry_run:
     print("Would have run git filter-repo to filter files")
 else:
-    ret = run_command(cmd)
-    if ret.returncode != 0:
-        print(f"Failure: {ret.stderr}")
-        sys.exit(ret.returncode)
+    run_command(cmd)
 
 print("Renaming Paths")
 cmd = "git filter-repo"
@@ -135,10 +130,7 @@ if args.dry_run:
     print("Would have created the branch-source branch")
     print("Would have merged branch-source into extension")
 else:
-    ret = run_command(cmd)
-    if ret.returncode != 0:
-        print(f"Failure: {ret.stderr}")
-        sys.exit(ret.returncode)
+    run_command(cmd)
 
     os.chdir(previous_cwd)
 
@@ -147,33 +139,18 @@ else:
 
     # Create the filter-target branch
     print("Checking out filter-target branch")
-    ret = run_command("git checkout -b filter-target")
-    if ret.returncode != 0:
-        print(f"Failure: {ret.stderr}")
-        sys.exit(ret.returncode)
+    run_command("git checkout -b filter-target")
 
     print("Adding repo-source remote")
-    ret = run_command("git remote add repo-source ../salt")
-    if ret.returncode != 0:
-        print(f"Failure: {ret.stderr}")
-        sys.exit(ret.returncode)
+    run_command("git remote add repo-source ../salt")
 
     print("Fetch repo-source remote")
-    ret = run_command("git fetch repo-source")
-    if ret.returncode != 0:
-        print(f"Failure: {ret.stderr}")
-        sys.exit(ret.returncode)
+    run_command("git fetch repo-source")
 
     print("Creating the branch-source branch")
-    ret = run_command("git branch branch-source remotes/repo-source/filter-source")
-    if ret.returncode != 0:
-        print(f"Failure: {ret.stderr}")
-        sys.exit(ret.returncode)
+    run_command("git branch branch-source remotes/repo-source/filter-source")
 
     print("Merge branch-source into extension")
-    ret = run_command("git merge branch-source --allow-unrelated-histories")
-    if ret.returncode != 0:
-        print(f"Failure: {ret.stderr}")
-        sys.exit(ret.returncode)
+    run_command("git merge branch-source --allow-unrelated-histories")
 
 print("Success!")
