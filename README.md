@@ -31,6 +31,15 @@ cd apache
 
 ### 4. Create the New Salt Extension
 
+Use the copier template for the latest framework of Salt Extensions. This is the preferred way to create a new extension,
+as there is a lot of shared code between extensions that is easier to keep in sync with copier.
+
+```bash
+copier copy --trust https://github.com/lkubb/salt-extension-copier saltext-apache
+```
+
+#### Alternative Creation
+
 Use the create-salt-extension command to create a new Salt extension inside the extension migration directory. Replace
 the placeholders with your information:
 
@@ -49,13 +58,24 @@ create-salt-extension -A "Maintainer Name" \
 
 ### 5. Set Up the Extension Repository
 
-Navigate into the extension directory and initialize it as a Git repository:
+Navigate into the extension directory:
 
 ```bash
 cd saltext-apache
+```
+
+If you used the copier command to create the extension, it creates some boilerplate modules and tests
+that we want to get rid of before we pull in the actual code from Salt.
+
+```bash
+find src tests -type f ! -name __init__.py ! -name conftest.py -delete
+```
+
+Initialize it as a Git repository:
+
+```bash
 git init --initial-branch=main
-touch requirements/{changelog,dev,docs,docs-auto,lint,tests}.txt
-pip install pre-commit # may not need to be done again if in a pre-existing virtual environment
+pip install pre-commit  # may not need to be done again if in a pre-existing virtual environment
 pre-commit install
 git add .
 git commit -m "Initial commit of extension framework"
