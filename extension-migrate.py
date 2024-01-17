@@ -22,49 +22,64 @@ parser.add_argument("-z", "--debug", help="Display extra debugging info", action
 args = parser.parse_args()
 
 
-def run_command(cmd):
+def run_command(cmd, fatal=True):
     cmd_list = cmd.split(" ")
     ret = subprocess.run(cmd_list)
-    if ret.returncode != 0:
+    if ret.returncode != 0 and fatal:
         print(f"Failure: {ret.stderr}")
         sys.exit(ret.returncode)
     return
 
 
+def _exists_and_not_ignored(path, patterns_to_ignore):
+    if os.path.exists(path) and not any(fnmatch.fnmatch(path, pattern) for pattern in patterns_to_ignore):
+        return True
+    return False
+
+
 # Clone salt repository
 print("Cloning Salt")
 previous_cwd = os.getcwd()
-run_command("git clone git@github.com:saltstack/salt.git --single-branch")
+run_command("git clone git@github.com:saltstack/salt.git --single-branch", fatal=False)
 
 os.chdir("salt")
 
 # Create the filter-source branch
 print("Checking out filter-source branch")
-run_command("git checkout -b filter-source")
+run_command("git checkout -b filter-source", fatal=False)
 
 print("Calculating files")
 files_to_migrate = []
+patterns_to_ignore = [
+    "./.github/*",
+    "./doc/ref/*/all*",
+    "./salt/__init__.py",
+    "./salt/cache/__init__.py",
+    "./salt/cloud/__init__.py",
+    "./salt/engines/__init__.py",
+    "./salt/output/__init__.py",
+    "./salt/pillar/__init__.py",
+    "./tests/unit/conftest.py",
+]
 for root, dirs, files in os.walk("."):
     path = root.split(os.sep)
     full_path = os.path.join(*path)
     for _file in fnmatch.filter(files, f"*{args.file_filter}*"):
         dirname_full_path_file = os.path.dirname(f"{full_path}/{_file}")
+        if any(fnmatch.fnmatch(f"{full_path}/{_file}", pattern) for pattern in patterns_to_ignore):
+            continue
         files_to_migrate.append(f"{full_path}/{_file}")
-        if os.path.exists(f"{dirname_full_path_file}/conftest.py"):
+        if _exists_and_not_ignored(f"{dirname_full_path_file}/conftest.py", patterns_to_ignore):
             files_to_migrate.append(f"{dirname_full_path_file}/conftest.py")
-        if (
-            os.path.exists(f"{dirname_full_path_file}/__init__.py")
-            and f"{dirname_full_path_file}/__init__.py" != "salt/__init__.py"
-        ):
+        if _exists_and_not_ignored(f"{dirname_full_path_file}/__init__.py", patterns_to_ignore):
             files_to_migrate.append(f"{dirname_full_path_file}/__init__.py")
         parent_dirname_full_path_file = os.path.dirname(f"{dirname_full_path_file}")
-        if (
-            os.path.exists(f"{parent_dirname_full_path_file}/__init__.py")
-            and f"{parent_dirname_full_path_file}/__init__.py" != "salt/__init__.py"
-        ):
+        if _exists_and_not_ignored(f"{parent_dirname_full_path_file}/__init__.py", patterns_to_ignore):
             files_to_migrate.append(f"{parent_dirname_full_path_file}/__init__.py")
 
     for _dir in fnmatch.filter(dirs, f"*{args.file_filter}*"):
+        if any(fnmatch.fnmatch(f"{full_path}/{_dir}", pattern) for pattern in patterns_to_ignore):
+            continue
         files_to_migrate.append(f"{full_path}/{_dir}")
 
     for _file in fnmatch.filter(files, "*conftest.py*"):
@@ -92,7 +107,7 @@ for file in files_to_migrate:
     old_files.append(new_file)
 
     # swap doc for docs
-    new_file = re.sub("^doc", "docs", new_file)
+    new_file = re.sub("^doc/", "docs/", new_file)
 
     # swap salt path for extension path
     new_file = re.sub("^salt", f"src/saltext/{args.file_filter}", new_file)
@@ -142,7 +157,7 @@ else:
     run_command("git checkout -b filter-target")
 
     print("Adding repo-source remote")
-    run_command("git remote add repo-source ../salt")
+    run_command("git remote add repo-source ../salt", fatal=False)
 
     print("Fetch repo-source remote")
     run_command("git fetch repo-source")
