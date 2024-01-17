@@ -36,7 +36,7 @@ as there is a lot of shared code between extensions that is easier to keep in sy
 
 Install copier
 ```bash
-pip install copier
+pip install copier copier-templates-extensions
 ```
 
 ```bash
