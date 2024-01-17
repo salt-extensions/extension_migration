@@ -34,6 +34,11 @@ cd apache
 Use the copier template for the latest framework of Salt Extensions. This is the preferred way to create a new extension,
 as there is a lot of shared code between extensions that is easier to keep in sync with copier.
 
+Install copier
+```bash
+pip install copier
+```
+
 ```bash
 copier copy --trust https://github.com/lkubb/salt-extension-copier saltext-apache
 ```
