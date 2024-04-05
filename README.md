@@ -6,12 +6,7 @@ This repository is used to track and coordinate the migration of Salt modules to
 
 Follow these steps to set up your development environment and migrate Salt modules to extensions.
 
-### 1. Install the salt-extension Tool
-
-First, install the `salt-extension` tool by following the instructions in the [salt-extension
-repository](https://github.com/saltstack/salt-extension).
-
-### 2. Set Up Your Working Environment
+### 1. Set Up Your Working Environment
 
 Create an empty working directory and navigate into it:
 
@@ -20,7 +15,7 @@ mkdir working-dir
 cd working-dir
 ```
 
-### 3. Create a Directory for Extension Migration
+### 2. Create a Directory for Extension Migration
 
 Inside the working directory, create an empty directory to hold the extension migration files:
 
@@ -29,7 +24,7 @@ mkdir apache
 cd apache
 ```
 
-### 4. Create the New Salt Extension
+### 3. Create the New Salt Extension
 
 Use the copier template for the latest framework of Salt Extensions. This is the preferred way to create a new extension,
 as there is a lot of shared code between extensions that is easier to keep in sync with copier.
@@ -40,28 +35,11 @@ pip install copier copier-templates-extensions
 ```
 
 ```bash
-copier copy --trust https://github.com/lkubb/salt-extension-copier saltext-apache
+copier copy --trust https://github.com/salt-extensions/salt-extension-copier saltext-apache
 ```
 
-#### Alternative Creation
 
-Use the create-salt-extension command to create a new Salt extension inside the extension migration directory. Replace
-the placeholders with your information:
-
-```bash
-create-salt-extension -A "Maintainer Name" \
-    -E "maintainer@example.com" \
-    -S "Salt Extension for interacting with Apache" \
-    -U "https://github.com/salt-extensions/saltext-apache" \
-    -L apache \
-    --dest saltext-apache \
-    apache
-```
-
-> **Note:** The `-L apache` option sets the license of the extension to "Apache 2.0" and should not be changed when
-> replacing placeholder text in the previous command. The other `apache` will be replaced with the name of the extension you are migrating.
-
-### 5. Set Up the Extension Repository
+### 4. Set Up the Extension Repository
 
 Navigate into the extension directory:
 
